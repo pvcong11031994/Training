@@ -1,30 +1,25 @@
 package handler
 
 import (
-	"encoding/json"
+	"github.com/labstack/echo/v4"
 	"golang/entity"
-	helper "golang/helpers"
 	"golang/models"
 	"net/http"
 )
 
-func CreateOrder(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	var order models.Orders
-	_ = json.NewDecoder(r.Body).Decode(&order)
+func CreateOrder(c echo.Context) error{
+	order := &models.Orders{}
+	if err := c.Bind(order); err != nil {
+		return err
+	}
 	//Validate
-	err := models.ValidateInputForm(order)
+	err := models.ValidateInputForm(*order)
 	if err != nil {
-		helper.BadRequestError(err, w)
-		return
+		panic(err.Error())
 	}
-
-	// Standardized Address
-
-	result, err := entity.CreateOrder(order)
+	result, err := entity.CreateOrder(*order)
 	if err != nil {
-		helper.InternalError(err, w)
-		return
+		panic(err.Error())
 	}
-	json.NewEncoder(w).Encode(result)
+	return c.JSON(http.StatusCreated, result)
 }
