@@ -1,0 +1,56 @@
+version: '3'
+services:
+    # zookeeper:
+    #   image: confluentinc/cp-zookeeper:5.4.0
+    #   hostname: zookeeper
+    #   container_name: zookeeper
+    #   ports:
+    #     - "2181:2181"
+    #   environment:
+    #     ZOOKEEPER_CLIENT_PORT: 2181
+    #     ZOOKEEPER_TICK_TIME: 2000
+  
+    # kafka:
+    #   image: confluentinc/cp-enterprise-kafka:5.4.0
+    #   hostname: kafka
+    #   container_name: kafka
+    #   depends_on:
+    #     - zookeeper
+    #   ports:
+    #     - "9092:9092"
+    #   environment:
+    #     KAFKA_BROKER_ID: 1
+    #     KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+    #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+    #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+    #     KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+    #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    #     KAFKA_AUTO_CREATE_TOPICS_ENABLED: 'true'
+    #     CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka:9092
+    #     CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
+    #     CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+    #     CONFLUENT_METRICS_ENABLE: 'true'
+    #     CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    producer:
+      build: .
+      ports: 
+        -  8080:8080
+      image: producer-with-docker
+      container_name: producer
+      networks: # Networks to join (Services on the same network can communicate with each other using their name)
+        - backend
+      # depends_on:
+      #   - kafka
+      # environment:
+      #   BOOTSTRAP_SERVERS: kafka:9092
+
+    # consumer:
+    #     build: mongo-to-kafka
+    #     environment:
+    #         - KAFKA_BROKER=localhost:9092
+    #         - KAFKA_TOPIC=test
+    #     depends_on:
+    #         - producer
+networks:
+  backend: 
