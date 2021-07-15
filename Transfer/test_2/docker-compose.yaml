@@ -1,0 +1,64 @@
+version: '3'
+services:
+    # zookeeper:
+    #   image: confluentinc/cp-zookeeper:5.4.0
+    #   hostname: zookeeper
+    #   container_name: zookeeper
+    #   ports:
+    #     - "2181:2181"
+    #   environment:
+    #     ZOOKEEPER_CLIENT_PORT: 2181
+    #     ZOOKEEPER_TICK_TIME: 2000
+  
+    # kafka:
+    #   image: confluentinc/cp-enterprise-kafka:5.4.0
+    #   hostname: kafka
+    #   container_name: kafka
+    #   depends_on:
+    #     - zookeeper
+    #   ports:
+    #     - "9092:9092"
+    #   environment:
+    #     KAFKA_BROKER_ID: 1
+    #     KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+    #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+    #     KAFKA_ADVERTISED_HOST_NAME: kafka
+    #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+    #     KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+    #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    #     KAFKA_AUTO_CREATE_TOPICS_ENABLED: 'true'
+    #     CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka:9092
+    #     CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
+    #     CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+    #     CONFLUENT_METRICS_ENABLE: 'true'
+    #     CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    producer:
+        build: 
+          context: producer
+        ports: 
+        -  8081:8081
+        environment:
+            - KAFKA_BROKER=kafka:9092
+            - KAFKA_TOPIC=test
+    consumer:
+        build:
+          context: consumer
+        environment:
+            - KAFKA_BROKER=kafka:9092
+            - KAFKA_TOPIC=test
+        depends_on:
+            - producer
+    mongo:
+      image: mongo
+      container_name: mongo
+      ports:
+        - "27017:27017"
+
+    producer_mongo:
+      image: mongo
+      volumes:
+        - './data:/data/db' # ensures data persistence between restarting
+      container_name: producer_mongo
+      ports:
+        - "27010:27017"
