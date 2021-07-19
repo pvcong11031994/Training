@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+	"errors"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
@@ -16,7 +16,7 @@ import (
 
 const (
 	hosts              = "mongodb_producer:27017"
-	database           = "db"
+	database           = "test"
 	username           = ""
 	password           = ""
 	collection         = "restaurants"
@@ -25,8 +25,19 @@ const (
 )
 
 type Restaurant struct {
-	RestaurantId string `json:"restaurantId"`
+	RestaurantId string `json:"restaurant_id" bson:"restaurant_id"`
+	Address Address `json:"address" bson:"address"`
+	Borough string `json:"borough" bson:"borough"`
+	Cuisine string `json:"cuisine" bson:"cuisine"`
+	Name string `json:"name" bson:"name"`
 }
+
+type Address struct {
+	Building string `json:"building" bson:"building"`
+	Street string `json:"street" bson:"street"`
+	Zipcode string `json:"zipcode" bson:"zipcode"`
+}
+
 
 type MongoStore struct {
 	session *mgo.Session
@@ -99,6 +110,11 @@ func restaurantsPostHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+	if len(restaurants) == 0 {
+		err := errors.New("No data")
+		http.Error(w, err.Error(), 400)
+		return
+	}
 	for i, value := range restaurants {
 		fmt.Println("Start Save Kafka: ", i)
 		err = saveRestaurantToKafka(value)
@@ -106,7 +122,7 @@ func restaurantsPostHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-		fmt.Println("End Save Kafka: ", i)
+		fmt.Println("\nEnd Save Kafka: ", i)
 		fmt.Println("------------------------")
 	}
 	if len(restaurants) > 0 {
