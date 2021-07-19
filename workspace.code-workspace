@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "Transfer/consumer"
+		},
+		{
+			"path": "Transfer/producer"
+		},
+		{
+			"path": "Transfer"
+		}
+	]
+}
