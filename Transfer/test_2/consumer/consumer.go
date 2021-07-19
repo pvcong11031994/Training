@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	hosts              = "mongo:27017"
+	hosts              = "mongodb_consumer:27017"
 	database           = "db"
 	username           = ""
 	password           = ""
