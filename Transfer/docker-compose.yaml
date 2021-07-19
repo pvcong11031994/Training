@@ -1,0 +1,19 @@
+version: '3'
+services:
+    producer:
+        build: 
+          context: producer
+        ports: 
+        -  8081:8081
+        environment:
+            - KAFKA_BROKER=kafka:9092
+            - KAFKA_TOPIC=test
+    consumer:
+        build:
+          context: consumer
+        environment:
+            - KAFKA_BROKER=kafka:9092
+            - KAFKA_TOPIC=test
+        depends_on:
+            - producer
+    
