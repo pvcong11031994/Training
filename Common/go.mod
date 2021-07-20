@@ -1,4 +1,4 @@
-module github.com/pvcong11031994/Training/Common
+module github.com/pvcong11031994/Training
 
 go 1.16
 
